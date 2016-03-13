@@ -3,19 +3,41 @@
 import os
 import re
 import shutil
+import hashlib
 
 tFolderList = []
 tFolderList2 = []
+md5dict = {}
 deltaList = []
 
 t2Path = "/Users/villan/Desktop/Python/Queue2/"
 tPath = "/Users/villan/Desktop/Python/Queue/"
 pathFinder = r"(.*/)(.*)$"
+thoroughScan = True
 
 print("")
 
+def md5hash(fname, switch):
+    hash = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash.update(chunk)
+    x = hash.hexdigest()
+    return x
+
+def hash_check(file):
+	completeName = tPath + file
+	completeName2 = t2Path + file
+	if completeName2 in md5dict['Destination']:
+		if not md5dict['Source'][completeName] == md5dict['Destination'][completeName2]:
+			print('MD5 Mismatch: ' + file)
+			deltaList.append(file)
+
 def folder_capture(path, switch):
 	folderList = []
+
+	if thoroughScan == True:
+		md5dict.setdefault(switch, {})
 
 	for root, dirs, files in os.walk(path):
 	
@@ -25,6 +47,9 @@ def folder_capture(path, switch):
 			if ".DS_Store" in i:
 				continue
 			folderList.append(result)
+
+			if thoroughScan == True:
+				md5dict[switch][tv] = md5hash(tv, switch)
 			
 	if not folderList:
 		if switch == "Source":
@@ -52,6 +77,10 @@ print("")
 for file in tFolderList:
 	if not file in tFolderList2:
 		deltaList.append(file)
+	
+	if thoroughScan == True:
+		hash_check(file)
+
 
 if not deltaList:
 	print('\nDirectories are in sync.' + '\n')
@@ -74,3 +103,5 @@ else:
 	print("")
 
 print("")
+
+#print(md5dict)
