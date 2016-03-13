@@ -14,40 +14,38 @@ pathFinder = r"(.*/)(.*)$"
 
 print("")
 
+def folder_capture(path, switch):
+	folderList = []
+
+	for root, dirs, files in os.walk(path):
+	
+		for i in files:
+			tv = root + "/" + i
+			result = tv[len(path):]
+			if ".DS_Store" in i:
+				continue
+			folderList.append(result)
+			
+	if not folderList:
+		if switch == "Source":
+			print('\nSource directory not available: ' + path + '\n')
+		elif switch == "Desination":
+			print('\nDestination directory is empty: ' + path + '\n')
+	else:
+		print(switch + " Directory: " + str(len(folderList)) + " files")	
+	
+	return folderList
+
 # TV Folder capture
 
-for root, dirs, files in os.walk(tvPath):
-	
-	for i in files:
-		tv = root + "/" + i
-		result = tv[len(tvPath):]
-		if ".DS_Store" in i:
-			continue
-		tvFolderList.append(result)
-		
-if not tvFolderList:
-	print('\nSource directory not available: ' + tvPath + '\n')
-	exit()
-else:
-	print("Source Directory: " + str(len(tvFolderList)) + " files")	
+tvFolderList = folder_capture(tvPath, "Source")
+
 
 # TV2 folder capture
+
+tvFolderList2 = folder_capture(tv2Path, "Destination")
 				
-for root, dirs, files in os.walk(tv2Path):
-	
-	for i in files:
-		tv2 = root + "/" + i
-		result2 = tv2[len(tv2Path):]
-		if ".DS_Store" in i:
-			continue
-		tvFolderList2.append(result2)
-
-if not tvFolderList2:
-	print('\nDestination directory empty: ' + tv2Path + '\n')
-
-else:
-	print("Destination Directory: " + str(len(tvFolderList2)) + " files")
-	print("")
+print("")
 
 # Compare folder capture
 
@@ -71,9 +69,9 @@ else:
 			
 			new = tvPath + newFile
 			shutil.copy(new, newFolder)
-			print("Copying: " + new + " -> " + newFolder)
+			print("Copying: " + newFile + " -> " + m.group(1))
 
-	print('\nDirectories are now in sync.' + '\n')
+	print('\n***** Directories are now in sync. *****' + '\n')
 	print("")
 
 print("")
